@@ -1,0 +1,12 @@
+{
+  "repo": "google-research/zapbench",
+  "base_branch": "main",
+  "base": "9a26d3fa23e1c933f87f15339e0d20f9b3fa6a97",
+  "source": "zapbench/ts_forecasting/data_source.py",
+  "test": "zapbench/ts_forecasting/data_source_prefetch_test.py",
+  "branch": "fix/prefetch-window-isolation-20260928",
+  "title": "Isolate prefetched time-series windows before applying transforms",
+  "issue": 39,
+  "issue_url": "https://github.com/google-research/zapbench/issues/39",
+  "head": "64f48e1d1d5e7ebf99249ca010f0a57d0ed5bb9e"
+}

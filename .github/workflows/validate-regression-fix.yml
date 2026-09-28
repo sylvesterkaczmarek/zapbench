@@ -1,0 +1,44 @@
+name: Exact-source regression validation
+on:
+  push:
+    branches: ['validation/prefetch-window-isolation-20260928']
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ['3.11', '3.12']
+    env:
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      JAX_PLATFORMS: cpu
+      CMAKE_BUILD_PARALLEL_LEVEL: '2'
+      PYTEST_SEED: '20260928'
+      PYTEST_XDIST_WORKER: 'master'
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          repository: sylvesterkaczmarek/zapbench
+          ref: '64f48e1d1d5e7ebf99249ca010f0a57d0ed5bb9e'
+          path: work
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install focused test dependencies
+        run: |
+          python -m pip install connectomics==20250606 grain==0.2.3 jax==0.4.38 jaxlib==0.4.38 flax==0.10.2 optax==0.2.4 orbax-checkpoint==0.11.5 numpy==1.26.4 tensorstore==0.1.85 ml-collections absl-py pytest pytest-cov ruff pyink build
+      - name: Verify exact source and original-code controls
+        run: python validation/verify.py work evidence
+      - name: Preserve evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: evidence-${{ matrix.python }}
+          path: evidence
+          retention-days: 14
